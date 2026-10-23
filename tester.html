@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>COOP テスター（外部サイト役）</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        button { padding: 10px 15px; font-size: 16px; cursor: pointer; }
+        .log { margin-top: 15px; padding: 10px; background: #eee; border-radius: 4px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h2>COOP 検証用テスター（攻撃者 / 外部サイト役）</h2>
+    <p>下のボタンを押して Salesforce の Visualforce ページをポップアップで開きます。</p>
+    
+    <button onclick="openVFPage()">Visualforce ページを開く</button>
+
+    <div class="log" id="log">ログがここに表示されます...</div>
+
+    <script>
+        // ★ここをご自身の Visualforce ページのURLに書き換えてください
+        const TARGET_URL = "https://your-domain--c.vf.force.com/apex/COOP_TestPage"; 
+        
+        let targetWindow = null;
+
+        function openVFPage() {
+            const logEl = document.getElementById('log');
+            logEl.innerHTML = "ウィンドウを開いています...<br>";
+
+            // 別ウィンドウで Visualforce ページを開く
+            targetWindow = window.open(TARGET_URL, '_blank', 'width=600,height=400');
+
+            // 2秒後に開いたウィンドウへのアクセスをテスト
+            setTimeout(() => {
+                if (!targetWindow) {
+                    logEl.innerHTML += "ウィンドウのオープンに失敗しました。<br>";
+                    return;
+                }
+
+                logEl.innerHTML += `targetWindow オブジェクト: ${targetWindow}<br>`;
+                
+                // window.closed プロパティの確認
+                try {
+                    logEl.innerHTML += `targetWindow.closed: <b>${targetWindow.closed}</b><br>`;
+                } catch (e) {
+                    logEl.innerHTML += `targetWindow.closed 取得エラー: ${e.message}<br>`;
+                }
+
+                // 参照が維持されているか確認（COOP無効時は window オブジェクトが取れるが、COOP有効時は参照が切れるか別コンテキストになる）
+                if (targetWindow.closed === false) {
+                    logEl.innerHTML += `<span style="color: red;">[結果] COOP 無効（または未適用）: 外部ウィンドウへの参照が維持されています。</span><br>`;
+                } else {
+                    logEl.innerHTML += `<span style="color: green;">[結果] COOP 有効: ウィンドウ参照が切断されたかアクセス不能です。</span><br>`;
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
