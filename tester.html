@@ -23,36 +23,35 @@
         
         let targetWindow = null;
 
-        function openVFPage() {
-            const logEl = document.getElementById('log');
-            logEl.innerHTML = "ウィンドウを開いています...<br>";
+function openVFPage() {
+    const logEl = document.getElementById('log');
+    logEl.innerHTML = "新しいタブを開いています...<br>";
 
-            // 別ウィンドウで Visualforce ページを開く
-            targetWindow = window.open(TARGET_URL, '_blank', 'width=600,height=400');
+    // ★ 第3引数（width/height指定）を消すと、新しい「タブ」で開きます
+    targetWindow = window.open(TARGET_URL, '_blank');
 
-            // 2秒後に開いたウィンドウへのアクセスをテスト
-            setTimeout(() => {
-                if (!targetWindow) {
-                    logEl.innerHTML += "ウィンドウのオープンに失敗しました。<br>";
-                    return;
-                }
+    // 2秒後に開いたタブへのアクセスをテスト
+    setTimeout(() => {
+        if (!targetWindow) {
+            logEl.innerHTML += "タブのオープンに失敗しました。<br>";
+            return;
+        }
 
-                logEl.innerHTML += `targetWindow オブジェクト: ${targetWindow}<br>`;
-                
-                // window.closed プロパティの確認
-                try {
-                    logEl.innerHTML += `targetWindow.closed: <b>${targetWindow.closed}</b><br>`;
-                } catch (e) {
-                    logEl.innerHTML += `targetWindow.closed 取得エラー: ${e.message}<br>`;
-                }
+        logEl.innerHTML += `targetWindow オブジェクト: ${targetWindow}<br>`;
+        
+        try {
+            logEl.innerHTML += `targetWindow.closed: <b>${targetWindow.closed}</b><br>`;
+        } catch (e) {
+            logEl.innerHTML += `targetWindow.closed 取得エラー: ${e.message}<br>`;
+        }
 
-                // 参照が維持されているか確認（COOP無効時は window オブジェクトが取れるが、COOP有効時は参照が切れるか別コンテキストになる）
-                if (targetWindow.closed === false) {
-                    logEl.innerHTML += `<span style="color: red;">[結果] COOP 無効（または未適用）: 外部ウィンドウへの参照が維持されています。</span><br>`;
-                } else {
-                    logEl.innerHTML += `<span style="color: green;">[結果] COOP 有効: ウィンドウ参照が切断されたかアクセス不能です。</span><br>`;
-                }
-            }, 2000);
+        if (targetWindow.closed === false) {
+            logEl.innerHTML += `<span style="color: red;">[結果] COOP 無効（または未適用）: 外部タブへの参照が維持されています。</span><br>`;
+        } else {
+            logEl.innerHTML += `<span style="color: green;">[結果] COOP 有効: タブ参照が切断されたかアクセス不能です。</span><br>`;
+        }
+    }, 2000);
+}
         }
     </script>
 </body>
